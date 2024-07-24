@@ -7,6 +7,21 @@ import emcee
 from corner import corner
 from matplotlib.ticker import MaxNLocator
 
+"""
+Project decription
+---------------------------------------------------------------------------------------------
+This file generates a set of data points from a straight line, with uncertainties in the x 
+and y directions, as well as covariances between the uncertainties.
+I then determine an estimate best fit using linear algebra methods, and use this
+estimate to determine the log prior probability distribution, log likelihood, and log
+posterior probability distribution.
+I am then able to sample model posteriors using emcee sampling. These samples are displayed
+in a corner plot showing the marginalized posterior distributions.
+Finally I plot the model posterior predictions against the data and the initial guess, with 
+each data point coloured by the posterior probability that it is an outlier.
+---------------------------------------------------------------------------------------------
+"""
+
 ############################################################################
 #       Generate data points and random 2D Covariances
 
@@ -91,9 +106,6 @@ ax.yaxis.set_major_locator(MaxNLocator(7))
     
 fig.tight_layout()
 
-fig.savefig("data.png")
-
-
 ############################################################################
 #       initialize model parameters
 
@@ -118,7 +130,6 @@ xl = np.array([-100, 700])
 ax.plot(xl, xl * m_lin + b_lin, 
         "-", c="tab:blue",
         lw=2, zorder=-1)
-fig.savefig("rough_solution.png")
 
 # Construct the covariance matrices that we'll actually need.
 C = np.array([[[x_e**2, x_e*y_e*rho],[x_e*y_e*rho, y_e**2]] \
@@ -236,8 +247,6 @@ fig = corner(
     labels=(r"$b$", r"$m$", r"$Q$"),
 )
 
-fig.savefig("q5_figure.png")
-
 ############################################################################
 #       Calculate posterior probability estimates for each data point.
 q = np.zeros_like(x)
@@ -289,6 +298,4 @@ ax.set_xlim(*xlim)
 ax.set_ylim(-100, 400)
 
 fig.tight_layout()
-
-fig.savefig("q6_figure.png")
 
