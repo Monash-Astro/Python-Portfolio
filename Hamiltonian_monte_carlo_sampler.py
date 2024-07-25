@@ -7,7 +7,6 @@ from scipy.stats import norm
 from chainconsumer import Chain, ChainConsumer
 import pandas as pd
 from corner import corner
-import stan_utils as Stan
 
 """
 This program assumes a 2D model with uncertainties in both dimensions.
@@ -18,7 +17,9 @@ At time a particle in the system at location x(t) with momentum p(t) can be full
 described by the Hamiltonian H(x, p) = U(x) + K(p).
 The time evolution of the particle is then described by dx/dt = δH/δp = p and 
 dp/dt = −δH/δx = −δlogp(x)/δx where logp(x) is the log posterior probability of the
-model pararameters x given y.
+model pararameters x given y. The Hamiltonian monte-carlo sampler makes use of this 
+potential and momentum distribution by sampling the model space as if it were a particle 
+caught in a gravity well.
 """
 
 ###########################################################################################
@@ -112,6 +113,7 @@ plt.show()
 
 from tqdm import tqdm
 
+# Create the hamiltonian integrator
 def ham_int(x_init, y_init, sig_x, sig_y, integrator, U, dU_dx):
 
     # theta = np.array([np.mean(x),np.mean(y)])
