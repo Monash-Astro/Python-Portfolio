@@ -9,186 +9,21 @@ import pandas as pd
 from corner import corner
 import stan_utils as Stan
 
+"""
+This program assumes a 2D model with uncertainties in both dimensions.
+Within I have constructed a Hamiltonian Monte Carlo Sampler in order to sample the phase
+space of this 2D model. By assuming the model depicts a physical gravity well, the phase
+space can be sampled by 'shooting' a test particle through the model.
+At time a particle in the system at location x(t) with momentum p(t) can be fully 
+described by the Hamiltonian H(x, p) = U(x) + K(p).
+The time evolution of the particle is then described by dx/dt = δH/δp = p and 
+dp/dt = −δH/δx = −δlogp(x)/δx where logp(x) is the log posterior probability of the
+model pararameters x given y.
+"""
 
+###########################################################################################
+#                    Define required data
 
-# ########################################################################################################################
-# #               Question 1
-# ########################################################################################################################
-
-# # Function to calculate Rosenbrock values
-# def rosenbrock(theta, a=1, b=100):
-#     x, y = theta
-#     return (a - x)**2 + b * (y - x**2)**2
-
-# # 250-250 grid
-# x = np.linspace(-2, 2, 250)
-# y = np.linspace(-2, 2, 250)
-# theta = np.meshgrid(x, y)
-
-# # Calculate the Rosenbrock function values for each point in the grid
-# cont = np.log(rosenbrock(theta))
-
-# # Plot the contours
-# plt.figure()
-# plt.contour(theta[0], theta[1], cont, levels=50, cmap='RdPu')
-# plt.colorbar(label='Rosenbrock Value')
-# plt.title('Rosenbrock Contour Plot')
-# plt.xlabel('X')
-# plt.ylabel('Y')
-# plt.show()
-# plt.savefig('q1_figure.png')
-
-
-
-# ########################################################################################################################
-# #               Question 2
-# ########################################################################################################################
-
-# # Initial position
-# x0 = np.array([-1.0, -1.0])
-
-# # Function to record the positions tried by the optimizer
-# def objective_function(theta):
-#     temp_pos.append(theta)
-
-# # BFGS (or L-BFGS-B) algorithm
-# temp_pos=[np.array([-1.0,-1.0])]
-# op_result_bfgs = op.minimize(rosenbrock, x0, method='L-BFGS-B', callback=objective_function)
-# BFGS_pos = temp_pos
-
-# # Nelder-Mead algorithm
-# temp_pos=[np.array([-1.0,-1.0])]
-# op_result_nelder_mead = op.minimize(rosenbrock, x0, method='Nelder-Mead', \
-#                                     callback=objective_function)
-# NM_pos = temp_pos
-
-# # TNC's algorithm
-# temp_pos=[np.array([-1.0,-1.0])]
-# op_result_TNC = op.minimize(rosenbrock, x0, method='TNC', callback=objective_function)
-# TNC_pos = temp_pos
-
-# # Plot the Rosenbrock function contours
-# x = np.linspace(-2, 2, 250)
-# y = np.linspace(-2, 2, 250)
-# X, Y = np.meshgrid(x, y)
-# Z = rosenbrock([X, Y])
-# plt.contour(X, Y, Z, levels=50, cmap='RdPu')
-
-# # Plot the optimization paths
-# plt.plot(*zip(*BFGS_pos), marker='o', label='BFGS')
-# plt.plot(*zip(*NM_pos  ), marker='o', label='Nelder-Mead')
-# plt.plot(*zip(*TNC_pos ), marker='o', label='dogleg')
-
-# # Mark the final solution
-# plt.scatter(op_result_bfgs.x[0], op_result_bfgs.x[1], color='red', \
-#             marker='x', label='BFGS Solution')
-# plt.scatter(op_result_nelder_mead.x[0], op_result_nelder_mead.x[1], color='blue', \
-#             marker='x', label='Nelder-Mead Solution')
-# plt.scatter(op_result_TNC.x[0], op_result_TNC.x[1], color='green', marker='x', \
-#             label='TNC Solution')
-# plt.xlabel('X')
-# plt.ylabel('Y')
-# plt.title('Optimization Paths for Rosenbrock Function')
-# plt.legend()
-# plt.show()
-# plt.savefig('q2_figure.png')
-
-
-
-# ########################################################################################################################
-# #               Question 3
-# ########################################################################################################################
-
-# # Create fake data
-# np.random.seed(0)
-# N = 30
-# x = np.random.uniform(0, 100, N)
-# theta = np.random.uniform(-1e-3, 1e-3, size=(4, 1))
-# # Define the design matrix.
-# A = np.vstack([
-#     np.ones(N),
-#     x,
-#     x**2,
-#     x**3
-# ]).T
-
-# y_true = (A @ theta).flatten()
-# y_err_intrinsic = 10 # MAGIC number!
-# y_err = y_err_intrinsic * np.random.randn(N)
-
-# y = y_true + np.random.randn(N) * y_err
-# y_err = np.abs(y_err)
-
-# ################################################################################################
-
-# # Models with different numbers of parameters
-# Y = np.atleast_2d(y).T
-# model_orders = [1, 2, 3, 4, 5, 6]
-# bics = []
-# bic_values = []
-# C = np.diag(y_err * y_err)
-# C_inv = np.linalg.inv(C)
-
-
-# for n in model_orders:
-#     # Modify design matrix A to include polynomial terms up to the given degree
-#     A = np.vstack([x**d for d in range(n)]).T
-    
-#     # Calculate parameters
-#     G = np.linalg.inv(A.T @ C_inv @ A)
-#     X = G @ (A.T @ C_inv @ Y)
-    
-#     # Compute log likelihood
-#     l = len(Y)
-#     U = Y - A @ X
-#     log_likelihood = -0.5 * U.T @ np.linalg.inv(C) @ U
-
-#     # Calculate BIC
-#     bic = -2 * log_likelihood + n * np.log(l)
-#     bic_values.append(bic.flatten().flatten())
-
-
-
-# print(bic_values)
-# print(np.argmin(bic_values))
-
-# # Plot BIC as a function of number of parameters
-# plt.figure(figsize=(10, 6))
-# plt.plot(model_orders, bic_values, marker='o', linestyle='-', color = 'r')
-# plt.xlabel('Number of Parameters (theta)')
-# plt.ylabel('Bayesian Information Criterion')
-# #plt.title('Bayesian Information Criteria (BIC)')
-# plt.grid(True)
-# plt.show()
-# plt.savefig('q3figure.png')
-
-
-########################################################################################################################
-#               Question 4
-########################################################################################################################
-
-
-def U(x_mean, y_mean):
-    z_x = (x - x_mean) / sig_x
-    z_y = (y - y_mean) / sig_y
-    U = (z_x**2 + z_y**2) + np.log(2 * np.pi * sig_x * sig_y)
-    return np.sum(U)
-
-
-def dU_dx(x_mean, y_mean):
-    dU_dxm = 0
-    dU_dym = 0
-    for i in range(len(x)):
-        dU_dxm += -2 * (x[i] - x_mean)/(sig_x[i]**2)
-        dU_dym += -2 * (y[i] - y_mean)/(sig_y[i]**2)
-    return np.array([dU_dxm, dU_dym])
-
-
-########################################################################################################################
-#               Question 5
-########################################################################################################################
-
-                   #  x     y    sig_x sig_y
 x, y, sig_x, sig_y = data = \
           np.array([[0.38, 0.32, 0.26, 0.01],
                     [0.30, 0.41, 0.07, 0.02],
@@ -201,42 +36,43 @@ x, y, sig_x, sig_y = data = \
                     [0.35, 0.29, 0.15, 0.02],
                     [0.23, 0.26, 0.15, 0.02]]).T
 
+# energy hamiltonian function
+def U(x_mean, y_mean):
+    z_x = (x - x_mean) / sig_x
+    z_y = (y - y_mean) / sig_y
+    U = (z_x**2 + z_y**2) + np.log(2 * np.pi * sig_x * sig_y)
+    return np.sum(U)
 
+# energy hamiltonian derivative function
+def dU_dx(x_mean, y_mean):
+    dU_dxm = 0
+    dU_dym = 0
+    for i in range(len(x)):
+        dU_dxm += -2 * (x[i] - x_mean)/(sig_x[i]**2)
+        dU_dym += -2 * (y[i] - y_mean)/(sig_y[i]**2)
+    return np.array([dU_dxm, dU_dym])
+
+# terrible leapfrog integrator
 def leapfrog_integration(x, p, dU_dx, n_steps, step_size):
-
-    xp = [] 
-    yp = []
-    E  = []
-    pp = []
-
-    x = np.copy(x)
-    p = np.copy(p)
-
-    xp.append(x[0])
-    yp.append(x[1])
-    E.append(U(*x))
-    pp.append(0.5*p.T@p)
-
-    # Take a half-step first.
+    xp, yp, E, pp = [x[0]], [x[1]], [U(*x)], [0.5 * p.T @ p]
+    x, p = np.copy(x), np.copy(p)
     p -= 0.5 * step_size * dU_dx(*x)
+    
     for step in range(n_steps):
         x += step_size * p
         p -= step_size * dU_dx(*x)
-
         xp.append(x[0])
         yp.append(x[1])
         E.append(U(*x))
-        pp.append(0.5*p.T@p)
-
+        pp.append(0.5 * p.T @ p)
+    
     x += step_size * p
     p -= 0.5 * step_size * dU_dx(*x)
-
     xp.append(x[0])
     yp.append(x[1])
     E.append(U(*x))
-    pp.append(0.5*p.T@p)
-
-
+    pp.append(0.5 * p.T @ p)
+    
     return x, -p, xp, yp, E, pp
 
 x_m = np.mean(x)
@@ -260,7 +96,6 @@ plt.title('leapfrog')
 plt.xlabel('x')
 plt.ylabel('y')
 plt.show()
-plt.savefig('q_5figure.png')
 
 plt.figure()
 plt.plot([i for i in range(len(E1))],np.array(E1), c='blue', label='Potential')
@@ -273,13 +108,7 @@ plt.xlabel('time')
 plt.ylabel('Energy')
 plt.legend()
 plt.show()
-plt.savefig('q_5figure2.png')
 
-
-
-########################################################################################################################
-#               Question 6
-########################################################################################################################
 
 from tqdm import tqdm
 
@@ -325,7 +154,6 @@ plt.title('leapfrog')
 plt.xlabel('x')
 plt.ylabel('y')
 plt.show()
-plt.savefig('q_6figure.png')
 
 
 fig, axes = plt.subplots(2, 1, figsize=(8, 4))
@@ -339,7 +167,6 @@ for i, (ax, label) in enumerate(zip(axes, labels)):
     # So we can see the initial behaviour:
     ax.set_xlim(-10, 1000)
     fig.tight_layout()
-plt.savefig('q_6figure2.png')
 
 
 df1 = pd.DataFrame(thetas1, columns=['x', 'y'])
@@ -349,51 +176,5 @@ c = ChainConsumer()
 c.add_chain(Chain(samples=df1, name="Chain 1"))
 c.add_chain(Chain(samples=df2, name="Chain 2"))
 fig = c.plotter.plot()
-fig.savefig('q_6figure3.png')
-
-
-
-
-
-
-
-########################################################################################################################
-#               Question 7
-########################################################################################################################
-
-# model = Stan.load_stan_model("HMC.stan")
-
-
-# data_dict = dict(
-#     x = x,
-#     y = y,
-#     sig_x = sig_x,
-#     sig_y = sig_y    
-# )
-
-# # Run optimisation.
-# opt_stan = model.optimizing(
-#     data=data_dict
-# )
-
-# # Run sampling.
-# samples = model.sampling(**stan.sampling_kwds(
-#     chains=2,
-#     iter=1000,
-#     data=data_dict,
-#     init=opt_stan
-# ))
-
-
-# print(samples)
-
-
-
-
-
-
-
-
-
 
 
