@@ -8,7 +8,7 @@ import scipy.optimize as op
 import emcee
 
 """
-Use gaussian processes to predict the brightness of a star for the next three months.
+Use gaussian processes to predict the brightness of a star for the next two months.
 """
 
 with open("star_data.pkl", "rb") as fp:
