@@ -40,7 +40,7 @@ for i in range(3):
   plt.plot(np.linspace(min(t),max(t), 10000), np.sin(2 * np.pi * f_max[i] * np.linspace(min(t),max(t), 10000)), label=f'p = ' + str(1/f_max[i]))
   plt.xlabel('time')
   plt.ylabel('y')
-  plt.title('Stellar data Q2')
+  plt.title('Stellar data')
   plt.legend()
   plt.show()
 
