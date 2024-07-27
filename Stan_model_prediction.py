@@ -3,18 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import cmdstanpy as stan
-import pickle
-from astropy.timeseries import LombScargle
-import george
-from george import kernels
-import scipy.optimize as op
-from tqdm import tqdm
-import emcee
-from sklearn.datasets import make_blobs
-from sklearn.datasets import fetch_lfw_people
 import seaborn as sns
-from matplotlib.patches import Ellipse
-import matplotlib.transforms as transforms
 from scipy.stats import multivariate_normal
 # from scipy import random
 
