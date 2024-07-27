@@ -89,22 +89,27 @@ covs = np.array([[[x_e**2, x_e*y_e*rho],
                   [x_e*y_e*rho, y_e**2]] \
                   for y_e, x_e, rho in zip(*data.T[2:])])
 
-fig, ax = plt.subplots(figsize=(4, 4))
+fig, ax = plt.subplots(figsize=(6, 6))
     
 ax.scatter(x, y, c="k", s=10)
 
 for xi, yi, cov in zip(x, y, covs):
     ax.add_artist(_ellipse(xi, yi, cov))
+ax.plot(0,0,c='blue', label='est. BFL (lin-alg)')
     
-ax.set_xlim(-50, 650)
-ax.set_ylim(-100, 350)
+# ax.set_xlim(-50, 650)
+# ax.set_ylim(-100, 350)
 ax.set_xlabel(r"$x$")
 ax.set_ylabel(r"$y$")
+ax.set_title('Generated data - w. error ellipse')
     
 ax.xaxis.set_major_locator(MaxNLocator(6))
 ax.yaxis.set_major_locator(MaxNLocator(7))
     
 fig.tight_layout()
+fig.legend()
+fig.savefig('Generated data.png')
+plt.show()
 
 ############################################################################
 #       initialize model parameters
@@ -261,13 +266,14 @@ q /= np.prod(sampler.chain.shape[:2])
 ############################################################################
 #       Plot data with posterior probability estimates
 
-fig, ax = plt.subplots(figsize=(4, 4))
+fig, ax = plt.subplots(figsize=(6, 6))
 
 ax.scatter(x, y, c=q, edgecolor="k", lw=1, cmap="Greys", s=20)
 # We are using arbitrary covariance matrices, so we should show 
 # error ellipses instead of error bars.
 for xi, yi, cov in zip(x, y, covs):
     ax.add_artist(_ellipse(xi, yi, cov, scale=2, color="k"))
+ax.plot(0,0,c='blue', label='est. BFL (lin-alg)')
 
 
 xlim = np.array([-100, 650])
@@ -293,9 +299,11 @@ for index in np.random.choice(chain.shape[0], size=100):
 ax.plot(xl, xl * m_lin + b_lin, 
     "-", c="tab:blue",
     lw=2, zorder=-1)
+ax.plot(0,0,c='orange', label='Posterior Draws')
 
 ax.set_xlim(*xlim)
 ax.set_ylim(-100, 400)
-
+ax.set_title('Data w. identified outliers')
+fig.legend()
 fig.tight_layout()
 
