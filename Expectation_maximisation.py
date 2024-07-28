@@ -5,18 +5,8 @@ from sklearn.datasets import make_blobs
 from matplotlib.patches import Ellipse
 import matplotlib.transforms as transforms
 
-cmdstanpy as stan
-pickle
-astropy.timeseries import LombScargle
-george
-from george import kernels
-scipy.optimize as op
-tqdm
-emcee
-from sklearn.datasets import fetch_lfw_people
-seaborn as sns
-from scipy.stats import multivariate_normal
-
+############################################################################
+#               Generate necessary data
 def generate_data(data_seed, N=500, K=5):
     np.random.seed(data_seed)
     n_samples = np.random.multinomial(N, np.ones(K)/K)
@@ -113,8 +103,8 @@ def expectation_maximization(X):
 
     lll,llsl = [], []
     ll, ll_last = 0,1
-  step = 0
-    while abs(ll_last - ll) > 1e-5:
+    step = 0
+    while abs(ll_last - ll) > 0.1:
         ll_last = ll
 
         ll, weights = expectation(X, weights, pi, sigma, mu, 2, len(X), k)
@@ -122,11 +112,11 @@ def expectation_maximization(X):
 
         lll.append(ll)
         llsl.append(abs(ll_last - ll))
-        plot('Step' + str(step), mu, sigma, k, colors)
-      step += 1
+        plot('Step ' + str(step), mu, sigma, k, colors)
+        step += 1
     
     plt.figure()
-    plt.plot(np.linspace(0, len(lll[7:]), len(lll[7:])), lll[7:])
+    plt.plot(np.linspace(0, len(lll[1:]), len(lll[1:])), lll[1:])
     plt.xlabel('iterations')
     plt.ylabel('log-likelihood')
     plt.title('log-likelihood of data')
@@ -134,7 +124,7 @@ def expectation_maximization(X):
     plt.savefig('ll.png')
 
     plt.figure()
-    plt.plot(np.linspace(0, len(llsl[8:]), len(llsl[8:])),llsl[8:])
+    plt.plot(np.linspace(0, len(llsl[2:]), len(llsl[2:])),llsl[2:])
     plt.xlabel('iterations')
     plt.ylabel(r'$\Delta$ log-likelihood')
     plt.title(r'$\Delta$ log-likelihood of data')
