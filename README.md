@@ -54,6 +54,7 @@ Run python file, i.e
 
 
 ###########  Hamiltonian_monte_carlo_sampler.py  ###########
+
 This code includes data describing a square box to be sampled. I wrote a quick lepfrog integrator in order to 
 integrate the motion of a sample particle in the box (see script for physical description). I was able to plot three 
 instances of the integrator with new momenta each time, as described by the normal distribution p~N(0,1). I plot
