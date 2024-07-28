@@ -16,14 +16,24 @@ with open("star_data.pkl", "rb") as fp:
 
 t, y, yerr = data['t'], data['y'], data['yerr']
 
+# Plot initial data
+plt.figure()
+plt.errorbar(t, y, yerr)
+plt.xlabel('time')
+plt.ylabel('y')
+plt.title('Stellar data')
+plt.show()
+plt.savefig('Stellar data.png')
+
 frequency, power = LombScargle(t, y, yerr).autopower()
 
 plt.figure()
 plt.plot(frequency, power)
 plt.xlabel('frequency')
 plt.ylabel('power')
-plt.title('Frequency powers')
+plt.title('Best fit frequencies')
 plt.show()
+plt.title('Best fit frequencies')
 
 i1 = np.argmax(power[:int(len(power)/3)])
 i2 = int(len(power)/3)+np.argmax(power[int(len(power)/3): int(2*len(power)/3)])
@@ -33,31 +43,34 @@ f_max = [frequency[i] for i in i_max]
 ls = LombScargle(t, y, yerr)
 y_fits = [ls.model(t, f) for f in f_max]
 
+plt.figure()
+plt.errorbar(t, y, yerr)
 for i in range(3):
-  plt.figure()
-  plt.errorbar(t, y, yerr)
-  plt.plot(t, y_fits[i])
-  plt.plot(np.linspace(min(t),max(t), 10000), np.sin(2 * np.pi * f_max[i] * np.linspace(min(t),max(t), 10000)), label=f'p = ' + str(1/f_max[i]))
-  plt.xlabel('time')
-  plt.ylabel('y')
-  plt.title('Stellar data')
-  plt.legend()
-  plt.show()
+#   plt.plot(t, y_fits[i])
+  plt.plot(np.linspace(min(t),max(t), 10000), 
+            (1/(i+1))*np.sin(2 * np.pi * f_max[i] * np.linspace(min(t),max(t), 10000)), 
+            label=f'p = ' + str(1/f_max[i]))
+plt.xlabel('time')
+plt.ylabel('y')
+plt.title('Best fit frequencies')
+plt.legend()
+plt.show()
+plt.savefig('Best fit frequencies.png')
 
 p0, p1, p2 = 1/f_max[0], 1/f_max[1], 1/f_max[2]
 
 k1 = kernels.Matern32Kernel(1.0)
 k2 = kernels.ExpSine2Kernel(gamma=1.0, log_period=np.log(p0))
-k3 = kernels.RationalQuadraticKernel(log_alpha=1, metric=1)
-kernel = k1 + k2 + k3 #+ k4 + k5
+k3 = kernels.RationalQuadraticKernel(log_alpha=1, metric=1)     # Optional to set kernal 3 as well (takes significantly longer)
+kernel = k1 + k2 + k3  #uncomment kernel 3 if not wanted
 
 gp = george.GP(kernel, mean=np.mean(y), fit_mean=True,
                white_noise=np.log(0.19**2), fit_white_noise=True)
 
-# You need to compute the GP once before starting the optimization.
+# Compute the GP once before starting the optimization.
 gp.compute(t)
-print(gp.log_likelihood(y))
-print(gp.grad_log_likelihood(y))
+# print(gp.log_likelihood(y))
+# print(gp.grad_log_likelihood(y))
 
 #######################  construct kernels and optimise the hyperparameters  ####################### 
 
@@ -93,7 +106,9 @@ ax.fill_between(x, mu+std, mu-std, color="pink", alpha=0.5)
 ax.set_xlabel(r"year")
 ax.set_ylabel(r"Brightness")
 plt.legend()
+ax.set_title('Mean predicted path (w. 2 SD shaded)')
 fig.tight_layout()
+plt.savefig('Mean predicted path (w. 2 SD shaded).png')
 
 #######################  sample parameters and make predictions  ####################### 
 
@@ -138,4 +153,6 @@ ax.scatter(t, y, c="k", s=1)
 ax.set_xlim(t.min(), max(t)+61)
 ax.set_xlabel(r"year")
 ax.set_ylabel(r"Brightness")
+ax.set_title('Sample draws - predicted brightness')
 fig.tight_layout()
+plt.savefig('Sample draws - predicted brightness.png')
