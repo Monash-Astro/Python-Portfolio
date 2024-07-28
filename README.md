@@ -2,6 +2,7 @@
 My code portfolio
 
 ###########  Best_Fit_Line.py  ###########
+
 This code is used to construct a best fit line for data points with arbitrary two dimensional uncertainties. 
 Also uses mixture models and posterior probabilities to identify outliers, plottimng best fit draws for points 
 coloured by posterior probability of being outliers.
@@ -16,6 +17,7 @@ Run python file, i.e
 
 
 ###########  Expectation_maximisation.py  ###########
+
 This code generates a set of randomly clustered points. Using an expectation maximisation algorithm to increase 
 the logliklihood that a random set of initial points corresponds to the provided data points. The log liklihood
 as well as change in logliklihood are plotted as a function of iterations. The best fit points are also plotted 
@@ -30,6 +32,7 @@ Run python file, i.e
 
 
 ###########  Gaussian_model_prediction.py  ###########
+
 This code uses recorded data for the brightness of a star over a period of three months. I use a lombscargle 
 periodogram to identify the maximal frequencies present in the data. I then use Gaussian processes to
 predict the future brightness of the star for another two month period. I use the kernels
