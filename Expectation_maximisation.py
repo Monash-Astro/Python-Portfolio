@@ -54,6 +54,7 @@ def maximization(X, weights, pi, sigma, mu, n_points):
 ########################################################################################################
 #               Initialiser for data
 def initialization():
+    tol = 0.1   #set tolerance for execution
     k = 5
     pi = np.ones(k)/k
     sigma = np.zeros((k, 2, 2))
@@ -63,7 +64,7 @@ def initialization():
     mu = [[np.random.uniform(0, 2),np.random.uniform(0,2)] for _ in range(k)]
     colors = ['green', 'purple', 'red', 'blue', 'orange']
 
-    return k, pi, sigma, np.array(mu), weights, colors
+    return tol, k, pi, sigma, np.array(mu), weights, colors
 
 ########################################################################################################
 #               Functions for plotting data with ellipses
@@ -97,14 +98,17 @@ def plot(title, mu, sigma, k, colors):
     plt.clf()
 
 ########################################################################################################
-#               EM Algorythim                                    
+#               EM Algorythim          (not very elegant but works)                          
 def expectation_maximization(X):
-    k, pi, sigma, mu, weights, colors = initialization()
+    tol, k, pi, sigma, mu, weights, colors = initialization()
+
+    step = 0
+    plot('Step ' + str(step), mu, sigma, k, colors)
 
     lll,llsl = [], []
     ll, ll_last = 0,1
-    step = 0
-    while abs(ll_last - ll) > 0.1:
+    while abs(ll_last - ll) > tol:
+        step += 1
         ll_last = ll
 
         ll, weights = expectation(X, weights, pi, sigma, mu, 2, len(X), k)
@@ -113,7 +117,6 @@ def expectation_maximization(X):
         lll.append(ll)
         llsl.append(abs(ll_last - ll))
         plot('Step ' + str(step), mu, sigma, k, colors)
-        step += 1
     
     plt.figure()
     plt.plot(np.linspace(0, len(lll[1:]), len(lll[1:])), lll[1:])
