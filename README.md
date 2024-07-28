@@ -53,6 +53,34 @@ Run python file, i.e
   >>> Import Gaussian_model_prediction
 
 
+###########  Hamiltonian_monte_carlo_sampler.py  ###########
+This code includes data describing a square box to be sampled. I wrote a quick lepfrog integrator in order to 
+integrate the motion of a sample particle in the box (see script for physical description). I was able to plot three 
+instances of the integrator with new momenta each time, as described by the normal distribution p~N(0,1). I plot
+potential, kinetic, nd total energy to show that energy is conserved over the integration. I implemented the Hamiltonian 
+Monte Carlo system using the previous leapfrog integrator, for which I simply called twice with random initial positions 
+and momenta drawn from normal distributions. I plot both sample particle paths, as well as the chains thenselevs, which 
+have clearly converged (I truncate the burn in from the plot). Finally I create a corner plot showing the posterior 
+distributions of the model parameters.
+
+To run:
+Install necessary modules using command such as:
+  - pip install numpy matplotlib scipy chainconsumer pandas corner tqdm
+
+Run python file, i.e
+  >>> Import Hamiltonian_monte_carlo_sampler
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
